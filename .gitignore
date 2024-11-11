@@ -1,5 +1,18 @@
-*.class
-*.log
+# Exclude all hidden files except .gitignore, .scalafmt.conf, and .sbtopts-jenkins
+.*
+!/.gitignore
+!/.scalafmt.conf
+!/.sbtopts-jenkins
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
+# Exclude all the IDEA configurations except coding styles
+!/.idea/
+/.idea/*
+!/.idea/copyright/
+
+# Exclude all temporary and compiler-generated files and directories
+target/
+*.log
+*.iml
+*.js.map
+*.css.map
+project/metals.sbt
