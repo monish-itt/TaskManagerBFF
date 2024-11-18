@@ -6,6 +6,7 @@ import org.http4s.implicits._
 import org.http4s.server.blaze.BlazeServerBuilder
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 import org.typelevel.log4cats.Logger
+import cats.syntax.semigroupk._
 
 import scala.concurrent.ExecutionContext
 
@@ -25,7 +26,15 @@ object ServerApp extends IOApp {
 
     transactor.use { xa =>
       val taskRepo = new TaskRepository(xa)
-      val httpApp = TaskRoutes.taskRoutes[IO](taskRepo).orNotFound
+      val tagRepo = new TagRepository(xa)
+      val userRepo = new UserRepository(xa)
+
+      val taskRoutes = TaskRoutes.taskRoutes[IO](taskRepo)
+      val tagRoutes = TagRoutes.tagRoutes[IO](tagRepo)
+      val userRoutes = UserRoutes.userRoutes[IO](userRepo)
+
+
+      val httpApp = (taskRoutes <+> tagRoutes <+> userRoutes).orNotFound
 
       BlazeServerBuilder[IO](ExecutionContext.global)
         .bindHttp(9080, "localhost")

@@ -14,14 +14,14 @@ class TaskRepository(transactor: Transactor[IO])(implicit L: Logger[IO]) {
     val tagsArray = task.tags.mkString(",")
     val insertQuery = fr"""
       INSERT INTO tasks (id, task, status, tags)
-      VALUES ($taskId, ${task.task}, ${task.status}, ARRAY[$tagsArray]::text[])
+      VALUES ($taskId, ${task.task}, ${task.status}, ARRAY[$tagsArray]::text[], ${task.user_id})
     """
     insertQuery.update.run.transact(transactor)
   }
 
   def getTaskById(id: String): IO[Option[Task]] = {
     L.info(s"Retrieving task with id $id") >>
-      sql"SELECT id, task, status, tags FROM tasks WHERE id = $id"
+      sql"SELECT task_id, task, status, tags, user_id FROM tasks WHERE task_id = $id"
         .query[Task]
         .option
         .transact(transactor)
@@ -29,7 +29,7 @@ class TaskRepository(transactor: Transactor[IO])(implicit L: Logger[IO]) {
 
   def getAllTasks: IO[List[Task]] =
     L.info("Retrieving all tasks") >>
-      sql"SELECT id, task, status, tags FROM tasks"
+      sql"SELECT task_id, task, status, tags, user_id FROM tasks;"
         .query[Task]
         .to[List]
         .transact(transactor)
@@ -37,7 +37,7 @@ class TaskRepository(transactor: Transactor[IO])(implicit L: Logger[IO]) {
 
   def updateTask(id: String, task: Task): IO[Int] =
     L.info(s"Updating task with id $id with data: $task") >>
-      sql"UPDATE tasks SET task = ${task.task}, status = ${task.status}, tags = ARRAY[${task.tags.mkString(",")}]::text[] WHERE id = $id"
+      sql"UPDATE tasks SET task = ${task.task}, status = ${task.status}, tags = ARRAY[${task.tags.mkString(",")}]::text[] WHERE task_id = $id"
         .update.run
         .transact(transactor)
         .flatTap(updated =>
@@ -46,7 +46,7 @@ class TaskRepository(transactor: Transactor[IO])(implicit L: Logger[IO]) {
 
   def deleteTask(id: String): IO[Int] =
     L.info(s"Deleting task with id $id") >>
-      sql"DELETE FROM tasks WHERE id = $id"
+      sql"DELETE FROM tasks WHERE task_id = $id"
         .update.run
         .transact(transactor)
         .flatTap(deleted =>
