@@ -22,4 +22,10 @@ class UserRepository(transactor: Transactor[IO])(implicit L: Logger[IO]) {
 
   def deleteUser(id: String): IO[Int] =
     sql"DELETE FROM users WHERE user_id = $id".update.run.transact(transactor)
+
+  def getUserByUsernameAndPassword(username: String, password: String): IO[Option[User]] =
+    sql"SELECT user_id, username, password, role_id FROM users WHERE username = $username AND password = $password"
+      .query[User]
+      .option
+      .transact(transactor)
 }

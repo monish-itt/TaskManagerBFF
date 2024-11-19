@@ -32,9 +32,10 @@ object ServerApp extends IOApp {
       val taskRoutes = TaskRoutes.taskRoutes[IO](taskRepo)
       val tagRoutes = TagRoutes.tagRoutes[IO](tagRepo)
       val userRoutes = UserRoutes.userRoutes[IO](userRepo)
+      val authRoutes = AuthRoutes.authRoutes[IO](userRepo)
 
 
-      val httpApp = (taskRoutes <+> tagRoutes <+> userRoutes).orNotFound
+      val httpApp = (taskRoutes <+> tagRoutes <+> userRoutes <+> authRoutes).orNotFound
 
       BlazeServerBuilder[IO](ExecutionContext.global)
         .bindHttp(9080, "localhost")
