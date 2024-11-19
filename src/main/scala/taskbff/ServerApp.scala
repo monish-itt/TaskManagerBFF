@@ -40,7 +40,7 @@ object ServerApp extends IOApp {
       val securedTaskRoutes = AuthMiddleware[IO](AuthRoutes.validateJwtToken)(Sync[IO], logger)(taskRoutes)
       val securedTagRoutes = AuthMiddleware[IO](AuthRoutes.validateJwtToken)(Sync[IO], logger)(tagRoutes)
 
-      val httpApp = (securedTagRoutes <+> securedTaskRoutes <+> userRoutes <+> authRoutes).orNotFound
+      val httpApp = (userRoutes <+> authRoutes <+> securedTagRoutes <+> securedTaskRoutes ).orNotFound
 
       BlazeServerBuilder[IO](ExecutionContext.global)
         .bindHttp(9080, "localhost")
