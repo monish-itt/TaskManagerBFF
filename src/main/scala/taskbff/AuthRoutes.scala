@@ -12,7 +12,7 @@ import org.http4s.dsl.Http4sDsl
 import org.http4s.{Challenge, EntityDecoder, EntityEncoder, HttpRoutes}
 import org.typelevel.log4cats.Logger
 
-import java.util.{Date, UUID}
+import java.util.Date
 
 object AuthRoutes {
 
@@ -20,10 +20,10 @@ object AuthRoutes {
   private val jwtAlgorithm = Algorithm.HMAC256(SecretKey)
   private val TokenExpirationTimeMs = 60 * 60 * 1000 // 1 hour
 
-  implicit def loginEntityDecoder[F[_]: Async]: EntityDecoder[F, LoginRequest] = jsonOf[F, LoginRequest]
-  implicit def loginEntityEncoder[F[_]: Async]: EntityEncoder[F, LoginResponse] = jsonEncoderOf[F, LoginResponse]
+  implicit def loginEntityDecoder[F[_] : Async]: EntityDecoder[F, LoginRequest] = jsonOf[F, LoginRequest]
+  implicit def loginEntityEncoder[F[_] : Async]: EntityEncoder[F, LoginResponse] = jsonEncoderOf[F, LoginResponse]
 
-  def authRoutes[F[_]: Async: LiftIO: Logger](userRepo: UserRepository): HttpRoutes[F] = {
+  def authRoutes[F[_] : Async : LiftIO : Logger](userRepo: UserRepository): HttpRoutes[F] = {
     val dsl = Http4sDsl[F]
     import dsl._
 
@@ -40,7 +40,8 @@ object AuthRoutes {
               Ok(LoginResponse(token))
             case None =>
               val challenge = Challenge("Bearer", "Invalid username or password")
-              Unauthorized(challenge)          }
+              Unauthorized(challenge)
+          }
         } yield response
 
       // Logout: (Optional) Clear token on the client

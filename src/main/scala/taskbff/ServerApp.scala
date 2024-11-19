@@ -1,16 +1,19 @@
 package taskbff
 
-import cats.effect.{ExitCode, IO, IOApp, Resource}
+import cats.effect._
+import cats.syntax.semigroupk._
 import doobie.hikari.HikariTransactor
 import org.http4s.implicits._
 import org.http4s.server.blaze.BlazeServerBuilder
-import org.typelevel.log4cats.slf4j.Slf4jLogger
 import org.typelevel.log4cats.Logger
-import cats.syntax.semigroupk._
+import org.typelevel.log4cats.slf4j.Slf4jLogger
 
 import scala.concurrent.ExecutionContext
 
 object ServerApp extends IOApp {
+
+  implicit val logger: Logger[IO] = Slf4jLogger.getLogger[IO]
+
   private def transactor: Resource[IO, HikariTransactor[IO]] = {
     HikariTransactor.newHikariTransactor[IO](
       "org.postgresql.Driver",
@@ -22,7 +25,6 @@ object ServerApp extends IOApp {
   }
 
   override def run(args: List[String]): IO[ExitCode] = {
-    implicit val logger: Logger[IO] = Slf4jLogger.getLogger[IO]
 
     transactor.use { xa =>
       val taskRepo = new TaskRepository(xa)
@@ -34,8 +36,11 @@ object ServerApp extends IOApp {
       val userRoutes = UserRoutes.userRoutes[IO](userRepo)
       val authRoutes = AuthRoutes.authRoutes[IO](userRepo)
 
+      // Wrap routes with AuthMiddleware, logger is implicitly passed
+      val securedTaskRoutes = AuthMiddleware[IO](AuthRoutes.validateJwtToken)(Sync[IO], logger)(taskRoutes)
+      val securedTagRoutes = AuthMiddleware[IO](AuthRoutes.validateJwtToken)(Sync[IO], logger)(tagRoutes)
 
-      val httpApp = (taskRoutes <+> tagRoutes <+> userRoutes <+> authRoutes).orNotFound
+      val httpApp = (securedTagRoutes <+> securedTaskRoutes <+> userRoutes <+> authRoutes).orNotFound
 
       BlazeServerBuilder[IO](ExecutionContext.global)
         .bindHttp(9080, "localhost")
