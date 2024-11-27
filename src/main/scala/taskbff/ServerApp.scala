@@ -39,10 +39,8 @@ object ServerApp extends IOApp {
       // Wrap routes with AuthMiddleware, logger is implicitly passed
       val securedTaskRoutes = AuthMiddleware[IO](AuthRoutes.validateJwtToken)(Sync[IO], logger)(taskRoutes)
       val securedTagRoutes = AuthMiddleware[IO](AuthRoutes.validateJwtToken)(Sync[IO], logger)(tagRoutes)
-      val securedUserRoutes = AuthMiddleware[IO](AuthRoutes.validateJwtToken)(Sync[IO], logger)(userRoutes)
 
-
-      val httpApp = (authRoutes <+> securedUserRoutes <+> securedTagRoutes <+> securedTaskRoutes).orNotFound
+      val httpApp = (authRoutes <+> userRoutes <+> securedTagRoutes <+> securedTaskRoutes).orNotFound
 
       BlazeServerBuilder[IO](ExecutionContext.global)
         .bindHttp(9080, "localhost")
