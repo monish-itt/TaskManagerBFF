@@ -5,6 +5,8 @@ import cats.syntax.semigroupk._
 import doobie.hikari.HikariTransactor
 import org.http4s.implicits._
 import org.http4s.server.blaze.BlazeServerBuilder
+import org.http4s.server.middleware.CORS
+import org.http4s.server.middleware.CORSConfig
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 
@@ -36,11 +38,21 @@ object ServerApp extends IOApp {
       val userRoutes = UserRoutes.userRoutes[IO](userRepo)
       val authRoutes = AuthRoutes.authRoutes[IO](userRepo)
 
-      // Wrap routes with AuthMiddleware, logger is implicitly passed
       val securedTaskRoutes = AuthMiddleware[IO](AuthRoutes.validateJwtToken)(Sync[IO], logger)(taskRoutes)
       val securedTagRoutes = AuthMiddleware[IO](AuthRoutes.validateJwtToken)(Sync[IO], logger)(tagRoutes)
 
-      val httpApp = (authRoutes <+> userRoutes <+> securedTagRoutes <+> securedTaskRoutes).orNotFound
+      val corsConfig = CORSConfig(
+        anyOrigin = true,  // Allow all origins
+        allowedMethods = Some(Set("GET", "POST", "PUT", "DELETE", "OPTIONS")),
+        allowedHeaders = Some(Set("Content-Type", "Authorization")),
+        allowCredentials = true,
+        maxAge = 3600
+      )
+
+      val httpApp = CORS(
+        (authRoutes <+> userRoutes <+> securedTagRoutes <+> securedTaskRoutes).orNotFound,
+        corsConfig
+      )
 
       BlazeServerBuilder[IO](ExecutionContext.global)
         .bindHttp(9080, "localhost")
