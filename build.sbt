@@ -18,5 +18,6 @@ libraryDependencies ++= Seq(
   "org.tpolecat" %% "doobie-core" % "1.0.0-RC1",
   "org.tpolecat" %% "doobie-hikari" % "1.0.0-RC1",
   "org.tpolecat" %% "doobie-postgres" % "1.0.0-RC1",
-  "org.postgresql" % "postgresql" % "42.5.0"
+  "org.postgresql" % "postgresql" % "42.5.0",
+  "com.auth0" % "java-jwt" % "4.4.0"
 )
