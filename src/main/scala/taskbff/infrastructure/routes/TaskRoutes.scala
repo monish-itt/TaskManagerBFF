@@ -1,13 +1,16 @@
-package taskbff
+package taskbff.infrastructure.routes
 
 import cats.effect.{Async, LiftIO}
 import cats.implicits._
 import io.circe.generic.auto._
 import org.http4s.circe.CirceEntityCodec.circeEntityEncoder
-import org.http4s.{EntityDecoder, EntityEncoder, HttpRoutes}
 import org.http4s.circe.{jsonEncoderOf, jsonOf}
 import org.http4s.dsl.Http4sDsl
+import org.http4s.{EntityDecoder, EntityEncoder, HttpRoutes}
 import org.typelevel.log4cats.Logger
+import taskbff.Task
+import taskbff.domian.models.TaskData
+import taskbff.domian.repositories.TaskRepository
 
 object TaskRoutes {
 

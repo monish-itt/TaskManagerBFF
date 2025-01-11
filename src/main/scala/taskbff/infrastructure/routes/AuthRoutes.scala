@@ -1,4 +1,4 @@
-package taskbff
+package taskbff.infrastructure.routes
 
 import cats.effect.{Async, LiftIO}
 import cats.implicits._
@@ -11,6 +11,8 @@ import org.http4s.circe.{jsonEncoderOf, jsonOf}
 import org.http4s.dsl.Http4sDsl
 import org.http4s.{Challenge, EntityDecoder, EntityEncoder, HttpRoutes}
 import org.typelevel.log4cats.Logger
+import taskbff.domian.models._
+import taskbff.domian.repositories.UserRepository
 
 import java.util.Date
 
@@ -43,7 +45,7 @@ object AuthRoutes {
           response <- userOpt match {
             case Some(user) =>
               val accessToken = generateJwtToken(user, AccessTokenExpirationTimeMs)
-              Ok(LoginResponse(accessToken))
+              Ok(LoginResponse(accessToken, user.user_id))
             case None =>
               val challenge = Challenge("Bearer", "Invalid username or password")
               Unauthorized(challenge)
@@ -66,7 +68,7 @@ object AuthRoutes {
               LiftIO[F].liftIO(userRepo.getUserById(userId.toInt)).flatMap {
                 case Some(user) =>
                   val newToken = generateJwtToken(user, AccessTokenExpirationTimeMs)
-                  Ok(TokenRefreshResponse(newToken))
+                  Ok(TokenRefreshResponse(newToken, user.user_id))
                 case None =>
                   Forbidden("User not found for the given token")
               }
@@ -112,8 +114,3 @@ object AuthRoutes {
     }
   }
 }
-
-case class LoginRequest(username: String, password: String)
-case class LoginResponse(accessToken: String)
-case class TokenRefreshRequest(token: String)
-case class TokenRefreshResponse(accessToken: String)

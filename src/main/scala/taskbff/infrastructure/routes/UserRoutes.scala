@@ -1,4 +1,4 @@
-package taskbff
+package taskbff.infrastructure.routes
 
 import cats.effect.{Async, LiftIO}
 import cats.implicits._
@@ -8,8 +8,8 @@ import org.http4s.circe.{jsonEncoderOf, jsonOf}
 import org.http4s.dsl.Http4sDsl
 import org.http4s.{EntityDecoder, EntityEncoder, HttpRoutes}
 import org.typelevel.log4cats.Logger
-
-import java.util.UUID
+import taskbff.domian.models.{User, UserData}
+import taskbff.domian.repositories.UserRepository
 
 object UserRoutes {
 
@@ -30,7 +30,7 @@ object UserRoutes {
         for {
           userData <- req.as[UserData] // Extract the user data from the request body
           _ <- Logger[F].info(s"Received request to create user: $userData")
-          val userWithRole = User(0, userData.username, userData.password, 2) // Set user_id to 0 for auto-increment
+          val userWithRole = User(0, userData.username, userData.password, userData.role_id) // Set user_id to 0 for auto-increment
           result <- LiftIO[F].liftIO(userRepo.createUser(userWithRole)).attempt
           response <- result match {
             case Right(createdUser) => Created(createdUser) // Return the created user with ID

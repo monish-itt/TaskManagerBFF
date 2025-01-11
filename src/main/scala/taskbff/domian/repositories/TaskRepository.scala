@@ -1,11 +1,10 @@
-package taskbff
+package taskbff.domian.repositories
 
 import cats.effect.IO
 import doobie._
 import doobie.implicits._
 import org.typelevel.log4cats.Logger
-
-import java.util.UUID
+import taskbff.Task
 
 class TaskRepository(transactor: Transactor[IO])(implicit L: Logger[IO]) {
 

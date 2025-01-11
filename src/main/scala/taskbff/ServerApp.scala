@@ -5,11 +5,13 @@ import cats.syntax.semigroupk._
 import doobie.hikari.HikariTransactor
 import org.http4s.implicits._
 import org.http4s.server.blaze.BlazeServerBuilder
-import org.http4s.server.middleware.CORS
-import org.http4s.server.middleware.CORSConfig
+import org.http4s.server.middleware.{CORS, CORSConfig}
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
-import taskbff.AuthRoutes.{ExpiredToken, InvalidToken, ValidToken}
+import taskbff.domian.repositories.{TagRepository, TaskRepository, UserRepository}
+import taskbff.infrastructure.middleware.AuthMiddleware
+import taskbff.infrastructure.routes.AuthRoutes.{ExpiredToken, InvalidToken, ValidToken}
+import taskbff.infrastructure.routes.{AuthRoutes, TagRoutes, TaskRoutes, UserRoutes}
 
 import scala.concurrent.ExecutionContext
 
@@ -77,7 +79,7 @@ object ServerApp extends IOApp {
         .withHttpApp(httpApp)
         .resource
         .use { _ =>
-          logger.info("Server started on http://localhost:9080") >> IO.never
+          logger.info("Server started on http://localhost:9090") >> IO.never
         }
         .as(ExitCode.Success)
     }

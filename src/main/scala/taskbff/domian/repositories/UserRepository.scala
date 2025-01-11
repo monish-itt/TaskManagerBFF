@@ -1,9 +1,10 @@
-package taskbff
+package taskbff.domian.repositories
 
 import cats.effect.IO
 import doobie._
 import doobie.implicits._
 import org.typelevel.log4cats.Logger
+import taskbff.domian.models.{User, UserData}
 
 
 class UserRepository(transactor: Transactor[IO])(implicit L: Logger[IO]) {

@@ -1,13 +1,12 @@
-package taskbff
+package taskbff.infrastructure.middleware
 
 import cats.data.{Kleisli, OptionT}
 import cats.effect.Sync
-import org.http4s.dsl.Http4sDsl
-import org.http4s.headers.Authorization
-import org.http4s.{Challenge, HttpRoutes, Request}
-import org.typelevel.log4cats.Logger
 import cats.syntax.apply._
 import org.http4s._
+import org.http4s.dsl.Http4sDsl
+import org.http4s.headers.Authorization
+import org.typelevel.log4cats.Logger
 
 
 object AuthMiddleware {
