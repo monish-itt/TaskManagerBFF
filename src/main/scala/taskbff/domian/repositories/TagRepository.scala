@@ -4,7 +4,7 @@ import cats.effect.IO
 import doobie._
 import doobie.implicits._
 import org.typelevel.log4cats.Logger
-import taskbff.Tag
+import taskbff.domian.models.Tag
 
 
 class TagRepository(transactor: Transactor[IO])(implicit L: Logger[IO]) {

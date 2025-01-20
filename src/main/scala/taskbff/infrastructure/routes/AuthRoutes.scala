@@ -21,7 +21,7 @@ object AuthRoutes {
   private val SecretKey = "QWERTY-SECRET-KEY"
   private val jwtAlgorithm = Algorithm.HMAC256(SecretKey)
 
-  private val AccessTokenExpirationTimeMs = 60000 // 1 minutes
+  private val AccessTokenExpirationTimeMs = 60000000 // 1 minutes
 
   implicit def loginEntityDecoder[F[_] : Async]: EntityDecoder[F, LoginRequest] = jsonOf[F, LoginRequest]
 

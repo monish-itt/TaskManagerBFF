@@ -4,13 +4,14 @@ import cats.effect.IO
 import doobie._
 import doobie.implicits._
 import org.typelevel.log4cats.Logger
-import taskbff.Task
+import taskbff.domian.models.Task
 
 class TaskRepository(transactor: Transactor[IO])(implicit L: Logger[IO]) {
 
   def createTask(task: Task): IO[Int] = {
     val tagsArray = task.tags.mkString(",")
-    val insertQuery = fr"""
+    val insertQuery =
+      fr"""
       INSERT INTO tasks (name, status_id, tags, user_id)
       VALUES (${task.task}, ${task.status}, ARRAY[$tagsArray]::text[], ${task.user_id})
     """
