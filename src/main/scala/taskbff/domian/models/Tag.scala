@@ -1,4 +1,4 @@
-package taskbff
+package taskbff.domian.models
 
 import doobie.Read
 

@@ -19,5 +19,8 @@ libraryDependencies ++= Seq(
   "org.tpolecat" %% "doobie-hikari" % "1.0.0-RC1",
   "org.tpolecat" %% "doobie-postgres" % "1.0.0-RC1",
   "org.postgresql" % "postgresql" % "42.5.0",
-  "com.auth0" % "java-jwt" % "4.4.0"
+  "com.auth0" % "java-jwt" % "4.4.0",
+  "com.typesafe" % "config" % "1.4.3",
+  "com.github.pureconfig" %% "pureconfig" % "0.17.7",
+  "com.github.pureconfig" %% "pureconfig-cats-effect" % "0.17.7"
 )

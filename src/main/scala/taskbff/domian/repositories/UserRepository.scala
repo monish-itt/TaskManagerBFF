@@ -16,6 +16,7 @@ class UserRepository(transactor: Transactor[IO])(implicit L: Logger[IO]) {
       .map(userId => user.copy(user_id = userId)) // Return the user with the generated user_id
       .transact(transactor)
   }
+
   def getUserById(id: Int): IO[Option[User]] =
     sql"SELECT id, username, password, role_id FROM users WHERE id = $id".query[User].option.transact(transactor)
 

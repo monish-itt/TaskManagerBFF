@@ -8,8 +8,7 @@ import org.http4s.circe.{jsonEncoderOf, jsonOf}
 import org.http4s.dsl.Http4sDsl
 import org.http4s.{EntityDecoder, EntityEncoder, HttpRoutes}
 import org.typelevel.log4cats.Logger
-import taskbff.Tag
-import taskbff.domian.models.TagData
+import taskbff.domian.models.{Tag, TagData}
 import taskbff.domian.repositories.TagRepository
 
 object TagRoutes {
